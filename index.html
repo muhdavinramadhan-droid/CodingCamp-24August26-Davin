@@ -18,7 +18,18 @@
     ></div>
 
     <main id="dashboard" class="dashboard">
-      <h1 class="dashboard__title">Life Dashboard</h1>
+      <div class="dashboard__header">
+        <h1 class="dashboard__title">Life Dashboard</h1>
+        <button
+          id="theme-toggle"
+          type="button"
+          class="theme-toggle"
+          aria-pressed="false"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true">🌙</span>
+          <span class="theme-toggle__label">Dark mode</span>
+        </button>
+      </div>
 
       <!-- Section 1: Greeting -->
       <section
@@ -40,6 +51,30 @@
       >
         <h2 id="timer-heading" class="section__heading">Focus Timer</h2>
         <p id="timer-display" class="timer__display" aria-live="polite">25:00</p>
+        <form id="timer-duration-form" class="timer__duration">
+          <label for="timer-duration-input" class="timer__duration-label"
+            >Minutes</label
+          >
+          <input
+            id="timer-duration-input"
+            type="number"
+            class="timer__duration-input"
+            name="minutes"
+            min="1"
+            max="180"
+            step="1"
+            value="25"
+            inputmode="numeric"
+          />
+          <button type="submit" class="timer__duration-btn">Set</button>
+        </form>
+        <p
+          id="timer-error"
+          class="timer__error field-error"
+          role="alert"
+          aria-live="polite"
+          hidden
+        ></p>
         <div class="timer__controls">
           <button id="timer-start" type="button" class="timer__btn">
             Start
