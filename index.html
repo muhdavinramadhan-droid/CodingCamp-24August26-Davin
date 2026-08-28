@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <!-- Shared error/banner region for storage and session messages -->
+    <div
+      id="app-banner"
+      class="app-banner"
+      role="alert"
+      aria-live="polite"
+      hidden
+    ></div>
+
+    <main id="dashboard" class="dashboard">
+      <h1 class="dashboard__title">Life Dashboard</h1>
+
+      <!-- Section 1: Greeting -->
+      <section
+        id="greeting-section"
+        class="section greeting"
+        aria-labelledby="greeting-heading"
+      >
+        <h2 id="greeting-heading" class="section__heading">Greeting</h2>
+        <p id="greeting-time" class="greeting__time" aria-live="polite"></p>
+        <p id="greeting-date" class="greeting__date"></p>
+        <p id="greeting-text" class="greeting__text"></p>
+      </section>
+
+      <!-- Section 2: Focus Timer -->
+      <section
+        id="timer-section"
+        class="section timer"
+        aria-labelledby="timer-heading"
+      >
+        <h2 id="timer-heading" class="section__heading">Focus Timer</h2>
+        <p id="timer-display" class="timer__display" aria-live="polite">25:00</p>
+        <div class="timer__controls">
+          <button id="timer-start" type="button" class="timer__btn">
+            Start
+          </button>
+          <button id="timer-stop" type="button" class="timer__btn">Stop</button>
+          <button id="timer-reset" type="button" class="timer__btn">
+            Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- Section 3: To-Do List -->
+      <section
+        id="todo-section"
+        class="section todo"
+        aria-labelledby="todo-heading"
+      >
+        <h2 id="todo-heading" class="section__heading">To-Do List</h2>
+        <form id="todo-form" class="todo__form">
+          <label for="todo-input" class="todo__label">New task</label>
+          <input
+            id="todo-input"
+            type="text"
+            class="todo__input"
+            name="task"
+            placeholder="What needs to be done?"
+            autocomplete="off"
+            maxlength="500"
+          />
+          <button type="submit" class="todo__add-btn">Add</button>
+        </form>
+        <p
+          id="todo-error"
+          class="todo__error field-error"
+          role="alert"
+          aria-live="polite"
+          hidden
+        ></p>
+        <ul id="todo-list" class="todo__list"></ul>
+      </section>
+
+      <!-- Section 4: Quick Links -->
+      <section
+        id="links-section"
+        class="section links"
+        aria-labelledby="links-heading"
+      >
+        <h2 id="links-heading" class="section__heading">Quick Links</h2>
+        <form id="links-form" class="links__form">
+          <label for="link-label-input" class="links__label">Label</label>
+          <input
+            id="link-label-input"
+            type="text"
+            class="links__input"
+            name="label"
+            placeholder="e.g. Docs"
+            autocomplete="off"
+            maxlength="50"
+          />
+          <label for="link-url-input" class="links__label">URL</label>
+          <input
+            id="link-url-input"
+            type="url"
+            class="links__input"
+            name="url"
+            placeholder="https://example.com"
+            autocomplete="off"
+            maxlength="2048"
+          />
+          <button type="submit" class="links__add-btn">Add link</button>
+        </form>
+        <p
+          id="links-error"
+          class="links__error field-error"
+          role="alert"
+          aria-live="polite"
+          hidden
+        ></p>
+        <ul id="links-list" class="links__list"></ul>
+      </section>
+    </main>
+  </body>
+</html>

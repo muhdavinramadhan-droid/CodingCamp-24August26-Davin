@@ -1,0 +1,210 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Create page structure and file scaffolding": [
+      {
+        "executionId": "58fdc3ff-d75e-4fef-aa66-217159300774",
+        "chatSessionId": "sess_10b02e61-0f7d-40d6-a9f6-3df7fe3344c4",
+        "timestamp": 1787887818073
+      },
+      {
+        "executionId": "58fdc3ff-d75e-4fef-aa66-217159300774",
+        "chatSessionId": "sess_10b02e61-0f7d-40d6-a9f6-3df7fe3344c4",
+        "timestamp": 1787887968680
+      }
+    ],
+    "2.1 Implement time, date, and greeting helpers in `js/app.js`": [
+      {
+        "executionId": "af99f3f4-11e8-4812-97f1-acc03270f0c1",
+        "chatSessionId": "sess_3e964be0-dc4e-4bd6-a9bc-731bbd815958",
+        "timestamp": 1787888029807
+      },
+      {
+        "executionId": "af99f3f4-11e8-4812-97f1-acc03270f0c1",
+        "chatSessionId": "sess_3e964be0-dc4e-4bd6-a9bc-731bbd815958",
+        "timestamp": 1787888188491
+      }
+    ],
+    "2.5 Implement timer and validation helpers in `js/app.js`": [
+      {
+        "executionId": "c3ee60fd-a718-44b5-92aa-61b1ec3b8a32",
+        "chatSessionId": "sess_3cceb822-70c0-4c7f-af69-8db8735b2a34",
+        "timestamp": 1787888590138
+      },
+      {
+        "executionId": "c3ee60fd-a718-44b5-92aa-61b1ec3b8a32",
+        "chatSessionId": "sess_3cceb822-70c0-4c7f-af69-8db8735b2a34",
+        "timestamp": 1787888732210
+      }
+    ],
+    "2. Implement shared Utilities (pure functions)": [
+      {
+        "executionId": "c3ee60fd-a718-44b5-92aa-61b1ec3b8a32",
+        "chatSessionId": "sess_3cceb822-70c0-4c7f-af69-8db8735b2a34",
+        "timestamp": 1787888732275
+      }
+    ],
+    "3.1 Implement StorageService in `js/app.js`": [
+      {
+        "executionId": "fb2e9d3f-7a15-48e7-ad69-12597627e089",
+        "chatSessionId": "sess_28365ee6-86c6-4220-a9e0-0251b26ce155",
+        "timestamp": 1787888761351
+      },
+      {
+        "executionId": "fb2e9d3f-7a15-48e7-ad69-12597627e089",
+        "chatSessionId": "sess_28365ee6-86c6-4220-a9e0-0251b26ce155",
+        "timestamp": 1787889035800
+      }
+    ],
+    "3. Implement StorageService": [
+      {
+        "executionId": "fb2e9d3f-7a15-48e7-ad69-12597627e089",
+        "chatSessionId": "sess_28365ee6-86c6-4220-a9e0-0251b26ce155",
+        "timestamp": 1787889035856
+      }
+    ],
+    "4.1 Implement FocusTimerModule in `js/app.js`": [
+      {
+        "executionId": "07a97d43-e4fe-46d9-b25d-8abff435dfdd",
+        "chatSessionId": "sess_7df58ebf-2801-45ff-bf1e-c859b80aef77",
+        "timestamp": 1787889062717
+      },
+      {
+        "executionId": "07a97d43-e4fe-46d9-b25d-8abff435dfdd",
+        "chatSessionId": "sess_7df58ebf-2801-45ff-bf1e-c859b80aef77",
+        "timestamp": 1787889288858
+      }
+    ],
+    "4. Implement FocusTimerModule": [
+      {
+        "executionId": "07a97d43-e4fe-46d9-b25d-8abff435dfdd",
+        "chatSessionId": "sess_7df58ebf-2801-45ff-bf1e-c859b80aef77",
+        "timestamp": 1787889288931
+      }
+    ],
+    "5.1 Implement GreetingModule in `js/app.js`": [
+      {
+        "executionId": "d89a1c37-2578-4476-8d52-5ace50d3316f",
+        "chatSessionId": "sess_08b725c5-9d1f-4a9a-9e09-c64792932885",
+        "timestamp": 1787889314439
+      },
+      {
+        "executionId": "d89a1c37-2578-4476-8d52-5ace50d3316f",
+        "chatSessionId": "sess_08b725c5-9d1f-4a9a-9e09-c64792932885",
+        "timestamp": 1787889450189
+      }
+    ],
+    "5. Implement GreetingModule": [
+      {
+        "executionId": "d89a1c37-2578-4476-8d52-5ace50d3316f",
+        "chatSessionId": "sess_08b725c5-9d1f-4a9a-9e09-c64792932885",
+        "timestamp": 1787889450237
+      }
+    ],
+    "6. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "bd18854f-2113-4d46-a0c9-bb60c8671b9c",
+        "chatSessionId": "sess_bb1707c3-e96f-409b-a796-c12380b7e53c",
+        "timestamp": 1787889471527
+      },
+      {
+        "executionId": "d47669aa-c2dd-435d-82b5-29e4bf21b8d4",
+        "chatSessionId": "sess_bb1707c3-e96f-409b-a796-c12380b7e53c",
+        "timestamp": 1787899321498
+      }
+    ],
+    "7.1 Implement task state, rendering, and add/edit in `js/app.js`": [
+      {
+        "executionId": "e0411dd6-4ce0-46cb-bbd7-3eccdf10543e",
+        "chatSessionId": "sess_76ca8170-0f30-4e56-a992-66a23c4662ac",
+        "timestamp": 1787899413953
+      },
+      {
+        "executionId": "e0411dd6-4ce0-46cb-bbd7-3eccdf10543e",
+        "chatSessionId": "sess_76ca8170-0f30-4e56-a992-66a23c4662ac",
+        "timestamp": 1787899622401
+      }
+    ],
+    "7.2 Implement toggle and delete in `js/app.js`": [
+      {
+        "executionId": "ba07bcb5-7cd0-4566-95c5-a7ac073c790e",
+        "chatSessionId": "sess_9ecbb263-f0a3-443b-b4e3-4e61f8786c37",
+        "timestamp": 1787899677533
+      },
+      {
+        "executionId": "ba07bcb5-7cd0-4566-95c5-a7ac073c790e",
+        "chatSessionId": "sess_9ecbb263-f0a3-443b-b4e3-4e61f8786c37",
+        "timestamp": 1787899892811
+      }
+    ],
+    "7. Implement TodoListModule": [
+      {
+        "executionId": "ba07bcb5-7cd0-4566-95c5-a7ac073c790e",
+        "chatSessionId": "sess_9ecbb263-f0a3-443b-b4e3-4e61f8786c37",
+        "timestamp": 1787899892875
+      }
+    ],
+    "8.1 Implement quick-link state, rendering, add, open, and delete in `js/app.js`": [
+      {
+        "executionId": "2da6dc1c-8600-4794-8112-42c4ab930121",
+        "chatSessionId": "sess_d5b0153f-9c55-4c51-a14c-62d1c81c320f",
+        "timestamp": 1787899948944
+      },
+      {
+        "executionId": "2da6dc1c-8600-4794-8112-42c4ab930121",
+        "chatSessionId": "sess_d5b0153f-9c55-4c51-a14c-62d1c81c320f",
+        "timestamp": 1787900169967
+      }
+    ],
+    "8. Implement QuickLinksModule": [
+      {
+        "executionId": "2da6dc1c-8600-4794-8112-42c4ab930121",
+        "chatSessionId": "sess_d5b0153f-9c55-4c51-a14c-62d1c81c320f",
+        "timestamp": 1787900170034
+      }
+    ],
+    "9.1 Implement bootstrap in `js/app.js`": [
+      {
+        "executionId": "c6a0d50d-6d33-43c1-aa1f-f1f2be2edb4e",
+        "chatSessionId": "sess_e438afda-0997-4272-90f1-ac8fd109b976",
+        "timestamp": 1787900222455
+      },
+      {
+        "executionId": "c6a0d50d-6d33-43c1-aa1f-f1f2be2edb4e",
+        "chatSessionId": "sess_e438afda-0997-4272-90f1-ac8fd109b976",
+        "timestamp": 1787900434793
+      }
+    ],
+    "9. Implement App / Bootstrap and wire modules together": [
+      {
+        "executionId": "c6a0d50d-6d33-43c1-aa1f-f1f2be2edb4e",
+        "chatSessionId": "sess_e438afda-0997-4272-90f1-ac8fd109b976",
+        "timestamp": 1787900434910
+      }
+    ],
+    "10. Style the dashboard in css/styles.css": [
+      {
+        "executionId": "035269c6-0833-4907-8d63-433d99ed3266",
+        "chatSessionId": "sess_d3b845b3-7c72-4464-aaf8-540d031c8ff3",
+        "timestamp": 1787900680555
+      },
+      {
+        "executionId": "035269c6-0833-4907-8d63-433d99ed3266",
+        "chatSessionId": "sess_d3b845b3-7c72-4464-aaf8-540d031c8ff3",
+        "timestamp": 1787900857807
+      }
+    ],
+    "11. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "8d2d43b1-843b-47f5-8098-67eab81ed1ac",
+        "chatSessionId": "sess_5092df4b-4073-4beb-a098-e9d10e9f97f7",
+        "timestamp": 1787900946225
+      },
+      {
+        "executionId": "8d2d43b1-843b-47f5-8098-67eab81ed1ac",
+        "chatSessionId": "sess_5092df4b-4073-4beb-a098-e9d10e9f97f7",
+        "timestamp": 1787901561088
+      }
+    ]
+  }
+}
