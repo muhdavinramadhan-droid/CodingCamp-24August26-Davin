@@ -181,7 +181,8 @@
   // keys on every mutation.
   var STORAGE_KEYS = {
     TASKS: 'dashboard.tasks',
-    QUICK_LINKS: 'dashboard.quickLinks'
+    QUICK_LINKS: 'dashboard.quickLinks',
+    THEME: 'dashboard.theme'
   };
 
   /**
@@ -320,9 +321,19 @@
   // ---------------------------------------------------------------------------
   var TIMER_DURATION_SECONDS = 1500; // 25:00 (Timer_Duration, Requirement 2.1)
   var TIMER_TICK_MS = 1000;          // 1 s tick (Requirements 2.2, 2.3)
+  var TIMER_MIN_MINUTES = 1;         // custom-duration lower bound (challenge)
+  var TIMER_MAX_MINUTES = 120;       // custom-duration upper bound (challenge)
+
+  var TIMER_MESSAGES = {
+    INVALID: 'Enter a whole number of minutes between ' + TIMER_MIN_MINUTES +
+      ' and ' + TIMER_MAX_MINUTES + '.'
+  };
 
   var FocusTimerModule = {
     // Internal state.
+    // durationSeconds is the currently configured focus length (defaults to
+    // 25:00); remainingSeconds is what the countdown shows.
+    durationSeconds: TIMER_DURATION_SECONDS,
     remainingSeconds: TIMER_DURATION_SECONDS,
     intervalId: null,
 
@@ -331,6 +342,9 @@
     _startEl: null,
     _stopEl: null,
     _resetEl: null,
+    _durationFormEl: null,
+    _durationInputEl: null,
+    _errorEl: null,
 
     /**
      * Resolve the timer's DOM elements, wire the start/stop/reset controls, and
@@ -359,6 +373,15 @@
         this._resetEl = scope.querySelector
           ? scope.querySelector('#timer-reset')
           : null;
+        this._durationFormEl = scope.querySelector
+          ? scope.querySelector('#timer-duration-form')
+          : null;
+        this._durationInputEl = scope.querySelector
+          ? scope.querySelector('#timer-duration-input')
+          : null;
+        this._errorEl = scope.querySelector
+          ? scope.querySelector('#timer-error')
+          : null;
       }
 
       var self = this;
@@ -378,9 +401,81 @@
         });
       }
 
-      // Reset to the fixed 25:00 duration on load and paint it.
-      this.remainingSeconds = TIMER_DURATION_SECONDS;
+      // Wire the custom-duration form so submitting sets a new focus length
+      // (challenge: change Pomodoro time).
+      if (this._durationFormEl &&
+          typeof this._durationFormEl.addEventListener === 'function') {
+        this._durationFormEl.addEventListener('submit', function (event) {
+          if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+          }
+          var raw = self._durationInputEl ? self._durationInputEl.value : '';
+          self.setDuration(raw);
+        });
+      }
+
+      // Reset to the configured duration on load (defaults to 25:00) and paint.
+      this.remainingSeconds = this.durationSeconds;
       this.render();
+    },
+
+    /**
+     * Set a new focus duration from raw minutes input. Accepts a whole number
+     * of minutes between TIMER_MIN_MINUTES and TIMER_MAX_MINUTES; anything else
+     * is rejected with an inline error and leaves the current duration
+     * untouched. On success the countdown is stopped and reset to the new
+     * length so the change takes effect immediately (challenge: change
+     * Pomodoro time).
+     * @param {string|number} rawMinutes raw minutes input.
+     * @returns {{ok: boolean, reason?: string}}
+     */
+    setDuration: function (rawMinutes) {
+      var minutes = typeof rawMinutes === 'string'
+        ? Number(rawMinutes.trim())
+        : Number(rawMinutes);
+
+      var valid = isFinite(minutes) &&
+        Math.floor(minutes) === minutes &&
+        minutes >= TIMER_MIN_MINUTES &&
+        minutes <= TIMER_MAX_MINUTES;
+
+      if (!valid) {
+        this._showError(TIMER_MESSAGES.INVALID);
+        return { ok: false, reason: 'invalid' };
+      }
+
+      this._clearError();
+      this.durationSeconds = minutes * 60;
+
+      // Apply the new length immediately: stop any running countdown and reset
+      // the display to the full new duration.
+      this.stop();
+      this.remainingSeconds = this.durationSeconds;
+      this.render();
+      return { ok: true };
+    },
+
+    /**
+     * Show a message in the timer inline error region. Internal.
+     * @param {string} message
+     * @returns {void}
+     */
+    _showError: function (message) {
+      if (this._errorEl) {
+        this._errorEl.textContent = message;
+        this._errorEl.hidden = false;
+      }
+    },
+
+    /**
+     * Clear and hide the timer inline error region. Internal.
+     * @returns {void}
+     */
+    _clearError: function () {
+      if (this._errorEl) {
+        this._errorEl.textContent = '';
+        this._errorEl.hidden = true;
+      }
     },
 
     /**
@@ -438,7 +533,7 @@
      */
     reset: function () {
       this.stop();
-      this.remainingSeconds = TIMER_DURATION_SECONDS;
+      this.remainingSeconds = this.durationSeconds;
       this.render();
     },
 
@@ -635,6 +730,7 @@
   var TODO_MESSAGES = {
     EMPTY: 'Task text is required.',
     TOO_LONG: 'Maximum length is ' + TASK_TEXT_MAX + ' characters.',
+    DUPLICATE: 'That task is already on your list.',
     LOAD_FAILED: 'Saved tasks could not be loaded.',
     NOT_SAVED: 'The task could not be saved.',
     NOT_FOUND: 'That task no longer exists.'
@@ -762,6 +858,13 @@
         return { ok: false, reason: validation.reason };
       }
 
+      // Reject a task whose text already exists (case-insensitive), without
+      // mutating the list (challenge: prevent duplicate tasks).
+      if (this._hasDuplicate(validation.value)) {
+        this._showError(TODO_MESSAGES.DUPLICATE);
+        return { ok: false, reason: 'duplicate' };
+      }
+
       this._clearError();
 
       // In-memory update first so the UI reflects the change immediately (Req 3.2).
@@ -803,6 +906,13 @@
         // Reject the edit; the previous text is retained (Reqs 4.3, 4.4).
         this._showError(messageForReason(validation.reason));
         return { ok: false, reason: validation.reason };
+      }
+
+      // Reject an edit that would duplicate another task's text, ignoring the
+      // task being edited (challenge: prevent duplicate tasks).
+      if (this._hasDuplicate(validation.value, id)) {
+        this._showError(TODO_MESSAGES.DUPLICATE);
+        return { ok: false, reason: 'duplicate' };
       }
 
       this._clearError();
@@ -959,6 +1069,28 @@
      */
     _persist: function () {
       return StorageService.save(STORAGE_KEYS.TASKS, this.tasks);
+    },
+
+    /**
+     * Determine whether a task with the given text already exists, comparing
+     * case-insensitively on trimmed text. An optional excludeId skips a single
+     * task (used when editing so a task does not clash with itself). Internal.
+     * @param {string} text the already-trimmed candidate text.
+     * @param {string} [excludeId] a task id to ignore during the comparison.
+     * @returns {boolean}
+     */
+    _hasDuplicate: function (text, excludeId) {
+      var normalized = text.toLowerCase();
+      for (var i = 0; i < this.tasks.length; i += 1) {
+        var existing = this.tasks[i];
+        if (excludeId && existing.id === excludeId) {
+          continue;
+        }
+        if (existing.text.trim().toLowerCase() === normalized) {
+          return true;
+        }
+      }
+      return false;
     },
 
     /**
@@ -1516,6 +1648,88 @@
   }
 
   // ---------------------------------------------------------------------------
+  // ThemeModule — light/dark mode toggle (challenge). The selected theme is
+  // applied by toggling a `theme-dark` class on the document's root element and
+  // is persisted via StorageService so it is restored on the next load. When
+  // no theme has been stored the light theme is used.
+  // ---------------------------------------------------------------------------
+  var THEME_LIGHT = 'light';
+  var THEME_DARK = 'dark';
+  var THEME_DARK_CLASS = 'theme-dark';
+
+  var ThemeModule = {
+    theme: THEME_LIGHT,
+
+    _toggleEl: null,
+    _rootEl: null,
+
+    /**
+     * Resolve the toggle button and document root, restore any stored theme
+     * (defaulting to light), apply it, then wire the toggle click.
+     * @param {Element|Document} [rootEl] optional scope; defaults to document.
+     * @returns {void}
+     */
+    init: function (rootEl) {
+      var doc = typeof global.document !== 'undefined' ? global.document : null;
+      var scope = rootEl && typeof rootEl.querySelector === 'function'
+        ? rootEl
+        : doc;
+
+      if (scope && typeof scope.querySelector === 'function') {
+        this._toggleEl = scope.querySelector('#theme-toggle');
+      }
+      this._rootEl = doc ? doc.documentElement : null;
+
+      // Restore the stored theme; a missing key or any failure falls back to
+      // light.
+      var result = StorageService.load(STORAGE_KEYS.THEME);
+      this.theme = result.ok && result.value === THEME_DARK
+        ? THEME_DARK
+        : THEME_LIGHT;
+      this._apply();
+
+      var self = this;
+      if (this._toggleEl &&
+          typeof this._toggleEl.addEventListener === 'function') {
+        this._toggleEl.addEventListener('click', function () {
+          self.toggle();
+        });
+      }
+    },
+
+    /**
+     * Flip between light and dark, apply, and persist the choice.
+     * @returns {void}
+     */
+    toggle: function () {
+      this.theme = this.theme === THEME_DARK ? THEME_LIGHT : THEME_DARK;
+      this._apply();
+      StorageService.save(STORAGE_KEYS.THEME, this.theme);
+    },
+
+    /**
+     * Apply the current theme to the document root and sync the toggle's label
+     * and pressed state. Internal.
+     * @returns {void}
+     */
+    _apply: function () {
+      var isDark = this.theme === THEME_DARK;
+      if (this._rootEl && this._rootEl.classList) {
+        if (isDark) {
+          this._rootEl.classList.add(THEME_DARK_CLASS);
+        } else {
+          this._rootEl.classList.remove(THEME_DARK_CLASS);
+        }
+      }
+      if (this._toggleEl) {
+        // The button offers the action opposite to the current theme.
+        this._toggleEl.textContent = isDark ? 'Light mode' : 'Dark mode';
+        this._toggleEl.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      }
+    }
+  };
+
+  // ---------------------------------------------------------------------------
   // App / Bootstrap — the entry point run on DOMContentLoaded (design: App /
   // Bootstrap). It wires the four feature modules to their section containers
   // and owns the cross-cutting error banner shown for storage- and session-
@@ -1590,6 +1804,14 @@
 
       if (messages.length > 0) {
         this._showBanner(document, messages.join(' '));
+      }
+
+      // Theme toggle lives in the topbar (outside the section containers), so
+      // it is initialized against the whole document (challenge: light/dark).
+      try {
+        ThemeModule.init(document);
+      } catch (e) {
+        // A theme failure must not prevent the rest of the bootstrap.
       }
 
       // Initialize each feature module against its own section container so a
@@ -1695,6 +1917,7 @@
   Dashboard.GreetingModule = GreetingModule;
   Dashboard.TodoListModule = TodoListModule;
   Dashboard.QuickLinksModule = QuickLinksModule;
+  Dashboard.ThemeModule = ThemeModule;
   Dashboard.App = App;
   Dashboard.STORAGE_KEYS = STORAGE_KEYS;
   global.Dashboard = Dashboard;

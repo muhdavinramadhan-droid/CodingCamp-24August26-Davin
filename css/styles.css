@@ -42,6 +42,31 @@
     sans-serif;
 }
 
+/* Dark theme — applied when the ThemeModule adds `theme-dark` to <html>
+ * (challenge: light/dark mode). Only color tokens are overridden, so the whole
+ * UI recolors without any per-component dark rules. */
+.theme-dark {
+  --color-bg: #12151c;
+  --color-surface: #1c212b;
+  --color-text: #e6e9f0;
+  --color-text-muted: #9aa4b6;
+  --color-heading: #f2f4f9;
+  --color-border: #333b4a;
+  --color-accent: #6f8bff;
+  --color-accent-hover: #8ba1ff;
+  --color-accent-contrast: #10131a;
+
+  --color-error: #ff9a92;
+  --color-error-bg: #3a1f1d;
+  --color-error-border: #7a3a35;
+
+  --color-done-text: #9aa4b6;
+  --color-done-bg: #1d2c22;
+  --color-done-border: #3f7a4f;
+
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
 /* ---------------------------------------------------------------------------
  * Base / reset
  * ------------------------------------------------------------------------- */
@@ -85,12 +110,39 @@ input:focus-visible {
   gap: var(--gap);
 }
 
-.dashboard__title {
+/* Topbar — holds the title and the theme toggle on one row. */
+.dashboard__topbar {
   grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dashboard__title {
   margin: 0 0 4px;
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-heading);
+}
+
+/* Theme toggle button (challenge: light/dark mode). */
+.theme-toggle {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 /* ---------------------------------------------------------------------------
@@ -149,6 +201,53 @@ input:focus-visible {
   text-align: center;
   font-variant-numeric: tabular-nums;
   color: var(--color-heading);
+}
+
+/* Custom-duration form (challenge: change Pomodoro time). */
+.timer__duration {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.timer__duration-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.timer__duration-input {
+  width: 88px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.timer__duration-input:focus {
+  border-color: var(--color-accent);
+}
+
+.timer__duration-btn {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.timer__duration-btn:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 .timer__controls {
