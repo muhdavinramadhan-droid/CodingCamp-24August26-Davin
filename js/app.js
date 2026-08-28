@@ -104,31 +104,6 @@
     },
 
     /**
-     * Validate and normalize a focus-timer duration in minutes: coerce to an
-     * integer and enforce a range of 1-180 minutes. Returns a classified result
-     * so callers can surface the correct field error.
-     * @param {string|number} raw raw user input
-     * @returns {{ok: boolean, value?: number, reason?: string}}
-     *   ok:true with the integer minutes when valid; otherwise ok:false with
-     *   reason 'empty' (blank), 'invalid' (not a number), or 'out_of_range'
-     *   (< 1 or > 180).
-     */
-    validateDurationMinutes: function (raw) {
-      var str = typeof raw === 'string' ? raw.trim() : raw;
-      if (str === '' || str === null || typeof str === 'undefined') {
-        return { ok: false, reason: 'empty' };
-      }
-      var num = Number(str);
-      if (!isFinite(num) || Math.floor(num) !== num) {
-        return { ok: false, reason: 'invalid' };
-      }
-      if (num < 1 || num > 180) {
-        return { ok: false, reason: 'out_of_range' };
-      }
-      return { ok: true, value: num };
-    },
-
-    /**
      * Validate and normalize a quick-link label: trim, then enforce a length
      * of 1-50 characters (Requirements 8.1, 8.6).
      * @param {string} raw raw user input
@@ -206,9 +181,7 @@
   // keys on every mutation.
   var STORAGE_KEYS = {
     TASKS: 'dashboard.tasks',
-    QUICK_LINKS: 'dashboard.quickLinks',
-    THEME: 'dashboard.theme',
-    TIMER_MINUTES: 'dashboard.timerMinutes'
+    QUICK_LINKS: 'dashboard.quickLinks'
   };
 
   /**
@@ -348,21 +321,8 @@
   var TIMER_DURATION_SECONDS = 1500; // 25:00 (Timer_Duration, Requirement 2.1)
   var TIMER_TICK_MS = 1000;          // 1 s tick (Requirements 2.2, 2.3)
 
-  var TIMER_MIN_MINUTES = 1;   // lower bound for a configurable duration
-  var TIMER_MAX_MINUTES = 180; // upper bound for a configurable duration
-
-  var TIMER_MESSAGES = {
-    EMPTY: 'Enter a number of minutes.',
-    INVALID: 'Enter a whole number of minutes.',
-    OUT_OF_RANGE:
-      'Minutes must be between ' + TIMER_MIN_MINUTES + ' and ' +
-      TIMER_MAX_MINUTES + '.',
-    NOT_SAVED: 'The timer length could not be saved.'
-  };
-
   var FocusTimerModule = {
     // Internal state.
-    durationSeconds: TIMER_DURATION_SECONDS,
     remainingSeconds: TIMER_DURATION_SECONDS,
     intervalId: null,
 
@@ -371,9 +331,6 @@
     _startEl: null,
     _stopEl: null,
     _resetEl: null,
-    _durationFormEl: null,
-    _durationInputEl: null,
-    _errorEl: null,
 
     /**
      * Resolve the timer's DOM elements, wire the start/stop/reset controls, and
@@ -402,15 +359,6 @@
         this._resetEl = scope.querySelector
           ? scope.querySelector('#timer-reset')
           : null;
-        this._durationFormEl = scope.querySelector
-          ? scope.querySelector('#timer-duration-form')
-          : null;
-        this._durationInputEl = scope.querySelector
-          ? scope.querySelector('#timer-duration-input')
-          : null;
-        this._errorEl = scope.querySelector
-          ? scope.querySelector('#timer-error')
-          : null;
       }
 
       var self = this;
@@ -429,93 +377,10 @@
           self.reset();
         });
       }
-      if (this._durationFormEl &&
-          typeof this._durationFormEl.addEventListener === 'function') {
-        this._durationFormEl.addEventListener('submit', function (event) {
-          if (event && typeof event.preventDefault === 'function') {
-            event.preventDefault();
-          }
-          var raw = self._durationInputEl ? self._durationInputEl.value : '';
-          self.setDuration(raw);
-        });
-      }
 
-      // Load any saved duration (Change Pomodoro time). A missing/invalid saved
-      // value falls back to the default 25 minutes.
-      var loaded = StorageService.load(STORAGE_KEYS.TIMER_MINUTES);
-      var minutes = 25;
-      if (loaded.ok) {
-        var check = Utilities.validateDurationMinutes(loaded.value);
-        if (check.ok) {
-          minutes = check.value;
-        }
-      }
-      this.durationSeconds = minutes * 60;
-      this.remainingSeconds = this.durationSeconds;
-      if (this._durationInputEl) {
-        this._durationInputEl.value = String(minutes);
-      }
+      // Reset to the fixed 25:00 duration on load and paint it.
+      this.remainingSeconds = TIMER_DURATION_SECONDS;
       this.render();
-    },
-
-    /**
-     * Set a new focus-timer duration in minutes. Validates first; on success
-     * stops any running countdown, updates the duration, resets the remaining
-     * time to the new duration, repaints, and persists the minutes. Invalid
-     * input is rejected without changing the timer and surfaces a field error.
-     * A persistence failure keeps the in-memory change and warns.
-     * @param {string|number} rawMinutes raw user input.
-     * @returns {{ok: boolean, minutes?: number, reason?: string}}
-     */
-    setDuration: function (rawMinutes) {
-      var validation = Utilities.validateDurationMinutes(rawMinutes);
-      if (!validation.ok) {
-        this._showError(timerMessageForReason(validation.reason));
-        return { ok: false, reason: validation.reason };
-      }
-
-      this._clearError();
-
-      // Stop any active countdown and reset to the new full duration.
-      this.stop();
-      this.durationSeconds = validation.value * 60;
-      this.remainingSeconds = this.durationSeconds;
-      if (this._durationInputEl) {
-        this._durationInputEl.value = String(validation.value);
-      }
-      this.render();
-
-      var saved = StorageService.save(
-        STORAGE_KEYS.TIMER_MINUTES, validation.value
-      );
-      if (!saved.ok) {
-        this._showError(TIMER_MESSAGES.NOT_SAVED);
-        return { ok: false, minutes: validation.value, reason: 'not_saved' };
-      }
-      return { ok: true, minutes: validation.value };
-    },
-
-    /**
-     * Show a message in the timer inline error region. Internal.
-     * @param {string} message
-     * @returns {void}
-     */
-    _showError: function (message) {
-      if (this._errorEl) {
-        this._errorEl.textContent = message;
-        this._errorEl.hidden = false;
-      }
-    },
-
-    /**
-     * Clear and hide the timer inline error region. Internal.
-     * @returns {void}
-     */
-    _clearError: function () {
-      if (this._errorEl) {
-        this._errorEl.textContent = '';
-        this._errorEl.hidden = true;
-      }
     },
 
     /**
@@ -573,7 +438,7 @@
      */
     reset: function () {
       this.stop();
-      this.remainingSeconds = this.durationSeconds;
+      this.remainingSeconds = TIMER_DURATION_SECONDS;
       this.render();
     },
 
@@ -593,21 +458,6 @@
       this.render();
     }
   };
-
-  /**
-   * Map a timer duration validation failure reason to a user-facing message.
-   * @param {string} reason 'empty' | 'invalid' | 'out_of_range'
-   * @returns {string}
-   */
-  function timerMessageForReason(reason) {
-    if (reason === 'invalid') {
-      return TIMER_MESSAGES.INVALID;
-    }
-    if (reason === 'out_of_range') {
-      return TIMER_MESSAGES.OUT_OF_RANGE;
-    }
-    return TIMER_MESSAGES.EMPTY;
-  }
 
   // ---------------------------------------------------------------------------
   // GreetingModule — renders the current time (24-hour HH:MM), the full date,
@@ -787,8 +637,7 @@
     TOO_LONG: 'Maximum length is ' + TASK_TEXT_MAX + ' characters.',
     LOAD_FAILED: 'Saved tasks could not be loaded.',
     NOT_SAVED: 'The task could not be saved.',
-    NOT_FOUND: 'That task no longer exists.',
-    DUPLICATE: 'That task is already on your list.'
+    NOT_FOUND: 'That task no longer exists.'
   };
 
   var TodoListModule = {
@@ -913,13 +762,6 @@
         return { ok: false, reason: validation.reason };
       }
 
-      // Prevent duplicate tasks: reject a task whose trimmed text matches an
-      // existing task, compared case-insensitively, without mutating the list.
-      if (this._isDuplicate(validation.value)) {
-        this._showError(TODO_MESSAGES.DUPLICATE);
-        return { ok: false, reason: 'duplicate' };
-      }
-
       this._clearError();
 
       // In-memory update first so the UI reflects the change immediately (Req 3.2).
@@ -961,13 +803,6 @@
         // Reject the edit; the previous text is retained (Reqs 4.3, 4.4).
         this._showError(messageForReason(validation.reason));
         return { ok: false, reason: validation.reason };
-      }
-
-      // Prevent an edit from duplicating a different existing task. Matching the
-      // task's own current text is allowed (a no-op edit).
-      if (this._isDuplicate(validation.value, id)) {
-        this._showError(TODO_MESSAGES.DUPLICATE);
-        return { ok: false, reason: 'duplicate' };
       }
 
       this._clearError();
@@ -1124,29 +959,6 @@
      */
     _persist: function () {
       return StorageService.save(STORAGE_KEYS.TASKS, this.tasks);
-    },
-
-    /**
-     * Determine whether `text` matches an existing task's text, compared
-     * case-insensitively after trimming. An optional `exceptId` excludes one
-     * task from the comparison so a no-op edit of that task is not flagged as a
-     * duplicate. Internal.
-     * @param {string} text the candidate task text (already trimmed).
-     * @param {string} [exceptId] a task id to exclude from the comparison.
-     * @returns {boolean}
-     */
-    _isDuplicate: function (text, exceptId) {
-      var candidate = String(text).trim().toLowerCase();
-      for (var i = 0; i < this.tasks.length; i += 1) {
-        var existing = this.tasks[i];
-        if (exceptId && existing.id === exceptId) {
-          continue;
-        }
-        if (existing.text.trim().toLowerCase() === candidate) {
-          return true;
-        }
-      }
-      return false;
     },
 
     /**
@@ -1704,101 +1516,6 @@
   }
 
   // ---------------------------------------------------------------------------
-  // ThemeModule — owns the light/dark color theme. The chosen theme is applied
-  // as a `data-theme` attribute on the document's root element and persisted so
-  // it is restored on the next load. A missing/invalid saved value falls back
-  // to 'light'.
-  // ---------------------------------------------------------------------------
-  var THEME_LIGHT = 'light';
-  var THEME_DARK = 'dark';
-
-  var ThemeModule = {
-    theme: THEME_LIGHT,
-
-    _toggleEl: null,
-    _iconEl: null,
-    _labelEl: null,
-    _rootEl: null,
-
-    /**
-     * Resolve the theme toggle, load any saved theme (defaulting to light),
-     * apply it, and wire the toggle button.
-     * @param {Element|Document} [rootEl] optional scope; defaults to document.
-     * @returns {void}
-     */
-    init: function (rootEl) {
-      var doc = typeof global.document !== 'undefined' ? global.document : null;
-      var scope = rootEl && typeof rootEl.querySelector === 'function'
-        ? rootEl
-        : doc;
-
-      this._rootEl = doc && doc.documentElement ? doc.documentElement : null;
-
-      if (scope && typeof scope.querySelector === 'function') {
-        this._toggleEl = scope.querySelector('#theme-toggle');
-      }
-      // The toggle lives in the header, which may be outside a section scope;
-      // fall back to the document if it was not found within the scope.
-      if (!this._toggleEl && doc && typeof doc.querySelector === 'function') {
-        this._toggleEl = doc.querySelector('#theme-toggle');
-      }
-      if (this._toggleEl && typeof this._toggleEl.querySelector === 'function') {
-        this._iconEl = this._toggleEl.querySelector('.theme-toggle__icon');
-        this._labelEl = this._toggleEl.querySelector('.theme-toggle__label');
-      }
-
-      // Load the saved theme; default to light on missing/invalid values.
-      var loaded = StorageService.load(STORAGE_KEYS.THEME);
-      if (loaded.ok && loaded.value === THEME_DARK) {
-        this.theme = THEME_DARK;
-      } else {
-        this.theme = THEME_LIGHT;
-      }
-      this._apply();
-
-      var self = this;
-      if (this._toggleEl &&
-          typeof this._toggleEl.addEventListener === 'function') {
-        this._toggleEl.addEventListener('click', function () {
-          self.toggle();
-        });
-      }
-    },
-
-    /**
-     * Switch between light and dark, apply the change, and persist it.
-     * @returns {{ok: boolean, theme: string}}
-     */
-    toggle: function () {
-      this.theme = this.theme === THEME_DARK ? THEME_LIGHT : THEME_DARK;
-      this._apply();
-      var saved = StorageService.save(STORAGE_KEYS.THEME, this.theme);
-      return { ok: saved.ok, theme: this.theme };
-    },
-
-    /**
-     * Apply the current theme to the root element and reflect it in the toggle
-     * button's icon, label, and aria-pressed state. Internal.
-     * @returns {void}
-     */
-    _apply: function () {
-      var isDark = this.theme === THEME_DARK;
-      if (this._rootEl && typeof this._rootEl.setAttribute === 'function') {
-        this._rootEl.setAttribute('data-theme', this.theme);
-      }
-      if (this._toggleEl && typeof this._toggleEl.setAttribute === 'function') {
-        this._toggleEl.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-      }
-      if (this._iconEl) {
-        this._iconEl.textContent = isDark ? '☀️' : '🌙';
-      }
-      if (this._labelEl) {
-        this._labelEl.textContent = isDark ? 'Light mode' : 'Dark mode';
-      }
-    }
-  };
-
-  // ---------------------------------------------------------------------------
   // App / Bootstrap — the entry point run on DOMContentLoaded (design: App /
   // Bootstrap). It wires the four feature modules to their section containers
   // and owns the cross-cutting error banner shown for storage- and session-
@@ -1873,14 +1590,6 @@
 
       if (messages.length > 0) {
         this._showBanner(document, messages.join(' '));
-      }
-
-      // Theme applies to the whole document, so initialize it against the
-      // document rather than a single section.
-      try {
-        ThemeModule.init(document);
-      } catch (e) {
-        // Theme failing to init must not prevent the rest of the bootstrap.
       }
 
       // Initialize each feature module against its own section container so a
@@ -1986,7 +1695,6 @@
   Dashboard.GreetingModule = GreetingModule;
   Dashboard.TodoListModule = TodoListModule;
   Dashboard.QuickLinksModule = QuickLinksModule;
-  Dashboard.ThemeModule = ThemeModule;
   Dashboard.App = App;
   Dashboard.STORAGE_KEYS = STORAGE_KEYS;
   global.Dashboard = Dashboard;

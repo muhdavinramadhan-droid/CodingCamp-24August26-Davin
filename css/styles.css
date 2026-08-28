@@ -42,41 +42,6 @@
     sans-serif;
 }
 
-/* Dark theme — applied when the root element carries data-theme="dark"
- * (Light / Dark mode challenge). Overrides the color tokens only; layout and
- * sizing tokens are inherited unchanged. */
-:root[data-theme="dark"] {
-  --color-bg: #12151c;
-  --color-surface: #1c212b;
-  --color-text: #e6e9ef;
-  --color-text-muted: #a4adbd;
-  --color-heading: #f2f4f8;
-  --color-border: #333b4a;
-  --color-accent: #6d8bff;
-  --color-accent-hover: #8aa1ff;
-  --color-accent-contrast: #12151c;
-
-  --color-error: #ff8a80;
-  --color-error-bg: #3a2320;
-  --color-error-border: #6b322c;
-
-  --color-done-text: #9aa4b2;
-  --color-done-bg: #1e2d22;
-  --color-done-border: #3c6b48;
-
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-/* Smooth the transition when switching themes. */
-body,
-.section,
-.todo__input,
-.links__input,
-.timer__duration-input {
-  transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease;
-}
-
 /* ---------------------------------------------------------------------------
  * Base / reset
  * ------------------------------------------------------------------------- */
@@ -120,47 +85,12 @@ input:focus-visible {
   gap: var(--gap);
 }
 
-.dashboard__header {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-
 .dashboard__title {
-  margin: 0;
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--color-heading);
-}
-
-/* Theme toggle button (Light / Dark mode challenge). */
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-}
-
-.theme-toggle:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-}
-
-.theme-toggle__icon {
-  font-size: 1.1rem;
-  line-height: 1;
 }
 
 /* ---------------------------------------------------------------------------
@@ -242,52 +172,6 @@ input:focus-visible {
 }
 
 .timer__btn:hover {
-  background-color: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-}
-
-/* Configurable duration form (Change Pomodoro time challenge). */
-.timer__duration {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.timer__duration-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.timer__duration-input {
-  width: 84px;
-  padding: 8px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font: inherit;
-  color: var(--color-text);
-  background-color: var(--color-surface);
-}
-
-.timer__duration-input:focus {
-  border-color: var(--color-accent);
-}
-
-.timer__duration-btn {
-  padding: 8px 16px;
-  border: 1px solid var(--color-accent);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-accent);
-  color: var(--color-accent-contrast);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.timer__duration-btn:hover {
   background-color: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
 }
